@@ -1,4 +1,16 @@
 # React Template with Vite and Deno
+# BosserP05
+Proyecto Progra Profesional
+
+
+Terminal 1:
+deno run dev
+
+Terminal 2:
+deno run --allow-env --allow-read --allow-net server/main.ts
+
+
+
 
 This is a GitHub template project to set up a [React](https://react.dev/) app
 with TypeScript running on [Deno](https://deno.com). It uses
