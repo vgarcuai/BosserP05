@@ -54,25 +54,22 @@ export const handler = async (ctx: RouterContext<"/api/paquetes">) => {
 export const getPaquetesResidente = async (ctx: RouterContext<"/api/paquetes/residente">) => {
   try {
     const user = ctx.state.user;
-    let correo = user?.correo;
     let departamento = user?.departamento;
 
-    if (!correo || !departamento) {
+    if (!departamento) {
       ctx.response.status = 400;
-      ctx.response.body = { message: "Correo y departamento requeridos" };
+      ctx.response.body = { message: "Departamento requerido" };
       return;
     }
 
-    // Normaliza los datos
-    correo = correo.trim().toLowerCase();
+    // Normaliza el departamento
     departamento = departamento.trim().toLowerCase();
 
-    // Busca paquetes pendientes para ese residente y departamento
+    // Busca paquetes pendientes solo para el departamento
     const paquetes = await packages.find({
-      destinatario: correo,
       departamento,
       estado: "Pendiente",
-    }).limit(50).toArray(); // Limita a 50 resultados
+    }).limit(50).toArray();
 
     ctx.response.status = 200;
     ctx.response.body = paquetes;
