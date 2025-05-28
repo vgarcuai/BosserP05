@@ -1,5 +1,6 @@
-import { RouterContext } from "../../deps.ts";
-import { MongoClient } from "../../deps.ts";
+import { MongoClient, ObjectId, RouterContext } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
+import { RouterContext } from "https://deno.land/x/oak@v11.1.0/mod.ts"; // Si RouterContext no viene de mongo
+
 import { Package } from "../models/packageModel.ts";
 import { enviarCorreo } from "../util/email.ts"; // Importamos la función de email
 
@@ -77,5 +78,34 @@ export const getPaquetesResidente = async (ctx: RouterContext<"/api/paquetes/res
     console.error("Error en getPaquetesResidente:", err);
     ctx.response.status = 500;
     ctx.response.body = { error: "Error al buscar paquetes" };
+  }
+};
+
+export const marcarPaqueteRecibido = async (ctx: RouterContext<"/api/paquetes/:id/recibido">) => {
+  try {
+    const id = ctx.params.id;
+    if (!id) {
+      ctx.response.status = 400;
+      ctx.response.body = { message: "ID del paquete es requerido" };
+      return;
+    }
+
+    const { modifiedCount } = await packages.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { estado: "Entregado" } },
+    );
+
+    if (modifiedCount === 0) {
+      ctx.response.status = 404;
+      ctx.response.body = { message: "Paquete no encontrado" };
+      return;
+    }
+
+    ctx.response.status = 200;
+    ctx.response.body = { message: "Paquete marcado como recibido" };
+  } catch (error) {
+    console.error("Error en marcarPaqueteRecibido:", error);
+    ctx.response.status = 500;
+    ctx.response.body = { error: "Error actualizando el paquete" };
   }
 };
